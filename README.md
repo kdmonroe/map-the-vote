@@ -4,6 +4,8 @@ This project is an interactive visualization of the 2024 U.S. Electoral College 
 
 ## Project Overview
 
+![Map the Vote](./public/data/map-demo.png)
+
 This interactive map allows users to:
 - Visualize the current Electoral College distribution
 - Click on states to toggle between Democratic and Republican victories
