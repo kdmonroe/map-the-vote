@@ -74,6 +74,16 @@ function ElectionMap() {
   const [electoralVotes, setElectoralVotes] = useState({});
   const [totalVotes, setTotalVotes] = useState(0);
   const [stateAbbreviations, setStateAbbreviations] = useState({});
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(mediaQuery.matches);
+
+    const handler = () => setIsDarkMode(mediaQuery.matches);
+    mediaQuery.addListener(handler);
+    return () => mediaQuery.removeListener(handler);
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -183,10 +193,10 @@ function ElectionMap() {
   }, [state.demVotes, state.repVotes]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <div id="export-container" className="flex flex-col flex-grow">
-        <div className="p-4 bg-gray-100">
-          <h1 className="text-2xl font-bold">2024 Electoral College Map</h1>
+        <div className={`p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+          <h1 className="text-2xl font-bold">Map the Vote - 2024 Electoral College Map</h1>
           <p className="text-sm mt-2">
             Click on states and districts to see different electoral outcomes. Toggle between Democratic and Republican party victories. Initial state colors represent the 2020 election results.
           </p>
@@ -227,7 +237,7 @@ function ElectionMap() {
       </div>
 
       {/* New footer section */}
-      <footer className="p-4 bg-gray-200 text-center text-sm">
+      <footer className={`p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} text-center text-sm`}>
         This map was built with <a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">NextJS</a> and <a href="https://airbnb.io/visx/docs/geo" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">Visx Geo</a>.
       </footer>
     </div>

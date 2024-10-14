@@ -10,8 +10,15 @@ function ElectoralMap({
   const [geoData, setGeoData] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, content: '', x: 0, y: 0 });
   const containerRef = useRef(null);
-  const svgRef = useRef(null); // Reference to the SVG element
+  const svgRef = useRef(null);
   const [labelOffsets, setLabelOffsets] = useState({});
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleThemeChange = useCallback(() => {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(isDark);
+    document.documentElement.classList.toggle('dark', isDark);
+  }, []);
 
   useEffect(() => {
     fetch('/data/2010_us_states.geojson')
@@ -26,7 +33,14 @@ function ElectoralMap({
       .then((response) => response.json())
       .then((data) => setLabelOffsets(data))
       .catch((error) => console.error('Error loading label offsets:', error));
-  }, []);
+
+    handleThemeChange();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleThemeChange);
+
+    return () => {
+      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleThemeChange);
+    };
+  }, [handleThemeChange]);
 
   const getStateFill = useCallback(
     (stateName) => {
@@ -34,15 +48,25 @@ function ElectoralMap({
       const isSelected = selectedStates[stateName];
       const party = isSelected || stateInfo.party;
 
-      switch (party) {
-        case 'Dem':
-          return 'rgba(0, 0, 255, 0.6)'; // Blue for Democratic
-        case 'Rep':
-        default:
-          return 'rgba(255, 0, 0, 0.6)'; // Red for Republican
+      if (isDarkMode) {
+        switch (party) {
+          case 'Dem':
+            return 'rgba(0, 100, 255, 0.8)';
+          case 'Rep':
+          default:
+            return 'rgba(255, 50, 50, 0.8)';
+        }
+      } else {
+        switch (party) {
+          case 'Dem':
+            return 'rgba(0, 0, 255, 0.6)';
+          case 'Rep':
+          default:
+            return 'rgba(255, 0, 0, 0.6)';
+        }
       }
     },
-    [selectedStates, electoralVotes]
+    [selectedStates, electoralVotes, isDarkMode]
   );
 
   const handleStateClick = useCallback(
@@ -131,6 +155,7 @@ function ElectoralMap({
             height="100%"
             viewBox="0 0 960 600"
             preserveAspectRatio="xMidYMid meet"
+            style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }}
           >
             <AlbersUsa data={geoData}>
               {(projection) => (
@@ -187,7 +212,7 @@ function ElectoralMap({
                               style={{
                                 fontSize: '8px',
                                 fontWeight: 'bold',
-                                fill: 'white',
+                                fill: 'white', // Changed from '#000000' to 'white'
                                 textShadow: '1px 1px 1px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000',
                               }}
                             >

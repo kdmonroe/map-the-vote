@@ -1,15 +1,17 @@
-# 2024 Electoral College Map
+# Map the Vote
 
-This project is an interactive visualization of the 2024 U.S. Electoral College map, designed to demonstrate geospatial data representation and user interaction in a web application.
+Map the Vote is an interactive map of the 2024 U.S. Electoral College map where you can explore different electoral scenarios across the country. 
 
 ## Project Overview
+
+This project is designed to demonstrate simple geospatial data representation and user interaction in a React web application.
 
 ![Map the Vote](./public/data/map-demo.png)
 
 This interactive map allows users to:
 - Visualize the current Electoral College distribution
 - Click on states to toggle between Democratic and Republican victories
-- See real-time updates of electoral vote counts
+- See real-time updates of electoral vote counts as they are clicked
 - Export the customized map as an image
 
 ## Technologies Used
@@ -43,7 +45,7 @@ To run this project locally:
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Data Sources
-The electoral vote data and state information are stored in JSON files in the `public/data` directory. These can be easily updated for future elections or different scenarios.
+The electoral vote data and state information are stored in JSON files in the `public/data` directory. 
 
 ## Contributing
 Please feel free to submit issues or pull requests.

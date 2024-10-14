@@ -2,13 +2,16 @@
 import React from 'react';
 
 function ProgressBar({ demVotes, repVotes, totalVotes }) {
+  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const demPercentage = (demVotes / totalVotes) * 100;
   const repPercentage = (repVotes / totalVotes) * 100;
   const projectedWinner = demVotes >= 270 ? 'Democrat' : repVotes >= 270 ? 'Republican' : null;
 
   return (
-    <div className="w-full p-4 bg-white sticky top-0 z-10 progress-bar">
-      <div className="text-center mb-2 font-bold">Total Electoral Votes: {totalVotes}</div>
+    <div className={`w-full p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} sticky top-0 z-10 progress-bar`}>
+      <div className={`text-center mb-2 font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>
+        Total Electoral Votes: {totalVotes}
+      </div>
       <div className="relative h-8 bg-gray-200 rounded-full overflow-hidden">
         <div
           className="absolute left-0 h-full bg-blue-500"
