@@ -3,22 +3,15 @@
 import React, { useEffect, useState, useCallback, useRef, memo } from 'react';
 import { AlbersUsa } from '@visx/geo';
 import * as d3Geo from 'd3-geo';
+import dynamic from 'next/dynamic';
 
-function ElectoralMap({
-  selectedStates, electoralVotes, stateAbbreviations, dispatch,
-}) {
+const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, dispatch }) => {
   const [geoData, setGeoData] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, content: '', x: 0, y: 0 });
   const containerRef = useRef(null);
   const svgRef = useRef(null);
   const [labelOffsets, setLabelOffsets] = useState({});
   const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const handleThemeChange = useCallback(() => {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDarkMode(isDark);
-    document.documentElement.classList.toggle('dark', isDark);
-  }, []);
 
   useEffect(() => {
     fetch('/data/2010_us_states.geojson')
@@ -34,13 +27,16 @@ function ElectoralMap({
       .then((data) => setLabelOffsets(data))
       .catch((error) => console.error('Error loading label offsets:', error));
 
-    handleThemeChange();
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleThemeChange);
+    // Check for dark mode preference
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      setIsDarkMode(mediaQuery.matches);
 
-    return () => {
-      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleThemeChange);
-    };
-  }, [handleThemeChange]);
+      const handleChange = (e) => setIsDarkMode(e.matches);
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
+  }, []);
 
   const getStateFill = useCallback(
     (stateName) => {
@@ -393,6 +389,6 @@ function ElectoralMap({
       </div>
     </div>
   );
-}
+};
 
 export default memo(ElectoralMap);

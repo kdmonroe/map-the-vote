@@ -1,10 +1,12 @@
 // Page.js
 'use client';
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
-import ElectoralMap from '@/components/Map';
+import dynamic from 'next/dynamic';
 import ProgressBar from '@/components/ProgressBar'; // Make sure this import is present
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
+
+const ElectoralMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
 // Define the initial state
 const initialState = {
