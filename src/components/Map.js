@@ -1,11 +1,9 @@
-// Map.js
 'use client';
-import React, { useEffect, useState, useCallback, useRef, memo } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { AlbersUsa } from '@visx/geo';
 import * as d3Geo from 'd3-geo';
-import dynamic from 'next/dynamic';
 
-const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, dispatch }) => {
+function ElectoralMap({ selectedStates, electoralVotes, stateAbbreviations, dispatch }) {
   const [geoData, setGeoData] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, content: '', x: 0, y: 0 });
   const containerRef = useRef(null);
@@ -21,21 +19,16 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
       })
       .catch((error) => console.error('Error loading geo data:', error));
 
-    // Load label offsets
     fetch('/data/stateLabelOffsets.json')
       .then((response) => response.json())
       .then((data) => setLabelOffsets(data))
       .catch((error) => console.error('Error loading label offsets:', error));
 
-    // Check for dark mode preference
-    if (typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      setIsDarkMode(mediaQuery.matches);
-
-      const handleChange = (e) => setIsDarkMode(e.matches);
-      mediaQuery.addListener(handleChange);
-      return () => mediaQuery.removeListener(handleChange);
-    }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(mediaQuery.matches);
+    const handler = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addListener(handler);
+    return () => mediaQuery.removeListener(handler);
   }, []);
 
   const getStateFill = useCallback(
@@ -118,7 +111,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
     return <div>Loading map...</div>;
   }
 
-  // List of small states to include in the side component
   const smallStates = [
     'Rhode Island',
     'Delaware',
@@ -143,7 +135,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
       }}
     >
       <div style={{ display: 'flex', flex: 1 }}>
-        {/* Map Container */}
         <div style={{ flex: 1 }}>
           <svg
             ref={svgRef}
@@ -168,13 +159,10 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
                       stateInfo.abbreviation ||
                       stateName.slice(0, 2).toUpperCase();
 
-                    // Get label offset for the state
                     const offset = labelOffsets[stateName] || { x: 0, y: 0 };
 
-                    // Handle at-large votes for Maine and Nebraska
                     const isAtLargeState = ['Maine', 'Nebraska'].includes(stateName);
 
-                    // Handle districts for Maine and Nebraska
                     const districts = Object.entries(electoralVotes)
                       .filter(
                         ([key, value]) => value.parent === stateName && value.district === true
@@ -183,7 +171,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
 
                     return (
                       <g key={`state-${stateName}`} className="state-group">
-                        {/* State Path */}
                         <path
                           d={path}
                           fill={getStateFill(stateName)}
@@ -194,7 +181,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
                           onMouseLeave={handleMouseLeave}
                           style={{ cursor: 'pointer' }}
                         />
-                        {/* State Labels */}
                         {centroid && !smallStates.includes(stateName) && (
                           <g
                             transform={`translate(${centroid[0] + offset.x}, ${centroid[1] + offset.y})`}
@@ -208,7 +194,7 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
                               style={{
                                 fontSize: '8px',
                                 fontWeight: 'bold',
-                                fill: 'white', // Changed from '#000000' to 'white'
+                                fill: 'white',
                                 textShadow: '1px 1px 1px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000',
                               }}
                             >
@@ -229,10 +215,8 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
                             </text>
                           </g>
                         )}
-                        {/* At-Large Circles */}
                         {isAtLargeState &&
                           districts.map((district, index) => {
-                            // Position districts around the state centroid
                             const angle = (index / districts.length) * Math.PI * 2;
                             const radius = 20;
                             const dx = radius * Math.cos(angle);
@@ -295,7 +279,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
             </div>
           )}
         </div>
-        {/* Side Component */}
         <div
           className="side-component"
           style={{
@@ -305,7 +288,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
             overflowY: 'auto',
           }}
         >
-          {/* Small States */}
           <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>Small States</h3>
           <div>
             {smallStates.map((stateName) => {
@@ -341,7 +323,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
               );
             })}
           </div>
-          {/* At-Large Districts */}
           <h3 style={{ textAlign: 'center', margin: '20px 0 10px' }}>At-Large Districts</h3>
           <div>
             {['Maine', 'Nebraska'].map((stateName) => {
@@ -389,6 +370,6 @@ const ElectoralMap = ({ selectedStates, electoralVotes, stateAbbreviations, disp
       </div>
     </div>
   );
-};
+}
 
-export default memo(ElectoralMap);
+export default ElectoralMap;

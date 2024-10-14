@@ -2,10 +2,10 @@
 'use client';
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import ProgressBar from '@/components/ProgressBar'; // Make sure this import is present
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 
+const ProgressBar = dynamic(() => import('@/components/ProgressBar'), { ssr: false });
 const ElectoralMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
 // Define the initial state
@@ -79,10 +79,9 @@ function ElectionMap() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
+    setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDarkMode(mediaQuery.matches);
-
-    const handler = () => setIsDarkMode(mediaQuery.matches);
+    const handler = (e) => setIsDarkMode(e.matches);
     mediaQuery.addListener(handler);
     return () => mediaQuery.removeListener(handler);
   }, []);
@@ -195,7 +194,7 @@ function ElectionMap() {
   }, [state.demVotes, state.repVotes]);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+    <div className={isDarkMode ? 'dark' : ''}>
       <div id="export-container" className="flex flex-col flex-grow">
         <div className={`p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
           <h1 className="text-2xl font-bold">Map the Vote - 2024 Electoral College Map</h1>

@@ -1,8 +1,14 @@
 // ProgressBar.js
-import React from 'react';
+'use client';
+import { useState, useEffect } from 'react';
 
 function ProgressBar({ demVotes, repVotes, totalVotes }) {
-  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
+
   const demPercentage = (demVotes / totalVotes) * 100;
   const repPercentage = (repVotes / totalVotes) * 100;
   const projectedWinner = demVotes >= 270 ? 'Democrat' : repVotes >= 270 ? 'Republican' : null;
